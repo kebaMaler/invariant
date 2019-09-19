@@ -1,12 +1,9 @@
 package sola.martin.invariantapp
 
 import android.app.Activity
-import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -15,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 class NewItemActivity : AppCompatActivity(){
     private lateinit var editStartTime: EditText
     private lateinit var editEndTime: EditText
-    private lateinit var titleItme: EditText
+    private lateinit var titleItem: EditText
     private lateinit var saveBtn: Button
 
 
@@ -26,7 +23,7 @@ class NewItemActivity : AppCompatActivity(){
         setContentView(R.layout.activity_new_item)
         editStartTime = findViewById(R.id.start_time_editText)
         editEndTime = findViewById(R.id.endt_time_editText)
-        titleItme = findViewById(R.id.itemTitle_editText)
+        titleItem = findViewById(R.id.itemTitle_editText)
         saveBtn= findViewById(R.id.save_btn)
 
        saveBtn.setOnClickListener {
@@ -37,11 +34,14 @@ class NewItemActivity : AppCompatActivity(){
            } else {
                val  start = editStartTime.text.toString()
                val  end = editEndTime.text.toString()
-               val title = titleItme.text.toString()
+               val title = titleItem.text.toString()
 
-               replyIntent.putExtra(EXTRA_START, start)
-               replyIntent.putExtra(EXTRA_END, end)
-               replyIntent.putExtra(EXTRA_TITLE, title)
+               replyIntent.let {
+                   it.putExtra(EXTRA_START, start)
+                   it.putExtra(EXTRA_END, end)
+                   it.putExtra(EXTRA_TITLE, title)
+               }
+
                setResult(Activity.RESULT_OK, replyIntent)
            }
            finish()

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,6 +18,12 @@ class ItemAdapter internal constructor(
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var items = emptyList<Item>() // Cached copy of Items
+    private var removedPosition: Int = 0
+    lateinit var removedItem: Item
+    private var sourcePosition: Int = 0
+    private var targetPosition: Int = 0
+
+
 
     inner class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleItemView: TextView = itemView.findViewById(R.id.itemTitle_textView)
@@ -49,7 +56,18 @@ fun convertLongToTime(time: Long): String{
 
     return format.format(date)
 }
+    fun onDragAndDrop(p1: Int, p2: Int){
+        sourcePosition = p1
+        targetPosition = p2
+        Collections.swap(items, sourcePosition,targetPosition)
+        notifyItemMoved(sourcePosition,targetPosition)
+    }
 
+
+
+fun getItemAtPosition(position: Int): Item{
+ return    items.get(position)
+}
 
 
     override fun getItemCount() = items.size

@@ -8,9 +8,11 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,7 +46,34 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, newItemActivityRequestCode)
         }
 
+        val itemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
+            override fun onMove(
+                p0: RecyclerView,
+                p1: RecyclerView.ViewHolder,
+                p2: RecyclerView.ViewHolder
+            ): Boolean {
+                (adapter as ItemAdapter).onDragAndDrop(p1.adapterPosition, p2.adapterPosition)
+
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDirection: Int) {
+                var position = viewHolder.getAdapterPosition()
+                val item = adapter.getItemAtPosition(position)
+
+                   itemViewModel.deleteItem(item)
+
+
+            }
+
+
+        }
+
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
+
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -56,9 +85,11 @@ class MainActivity : AppCompatActivity() {
                     data.getStringExtra(NewItemActivity.EXTRA_START).toLong(),
                     data.getStringExtra(NewItemActivity.EXTRA_END).toLong()
                 )
-                
+
                 itemViewModel.insert(item)
             }
+
+
         } else {
             Toast.makeText(
                 applicationContext,
@@ -66,5 +97,8 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
         }
+
+
     }
+
 }

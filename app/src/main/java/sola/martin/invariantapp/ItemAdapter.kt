@@ -1,6 +1,7 @@
 package sola.martin.invariantapp
 
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -8,14 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.core.content.ContextCompat.startActivity
-
-
+import sola.martin.invariantapp.NewItemActivity.Companion.EXTRA_EDIT_ITEM
 
 
 class ItemAdapter internal constructor(
@@ -23,13 +22,13 @@ class ItemAdapter internal constructor(
 ) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
 
     private val con = context
-    private val editItemActivityRequestCode = 2
     private val inflater: LayoutInflater = LayoutInflater.from(con)
-    lateinit var items: MutableList<Item> // Cached copy of Items
+    lateinit var items: MutableList<Item>
     private var removedPosition: Int = 0
     lateinit var removedItem: Item
     private var sourcePosition: Int = 0
     private var targetPosition: Int = 0
+    private val editItemActivityRequestCode = 1
 
 
 
@@ -48,16 +47,16 @@ class ItemAdapter internal constructor(
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val current = items[position]
+        current.tag = position
 
         holder.titleItemView.text = current.title
         holder.endTimeItemView.text = convertLongToTime(current.endLong)
         holder.startTimeItemView.text = convertLongToTime(current.startLong)
         holder.editBtn.setOnClickListener {
 
-            val intent = Intent(con,  NewItemActivity::class.java)
-            
-
-            con.startActivity(intent)
+            val intent = Intent(con, NewItemActivity::class.java)
+            intent.putExtra(EXTRA_EDIT_ITEM, current)
+            (con as Activity).startActivityForResult(intent,editItemActivityRequestCode)
 
         }
 
@@ -89,7 +88,7 @@ fun getItemAtPosition(position: Int): Item{
 }
 
 
-    fun removeItem(position: Int, viewHolder: RecyclerView.ViewHolder) {
+    fun removeItemSwipe(position: Int, viewHolder: RecyclerView.ViewHolder) {
         removedItem = items[position]
         removedPosition = position
 
@@ -101,6 +100,15 @@ fun getItemAtPosition(position: Int): Item{
             notifyItemInserted(removedPosition)
 
         }.show()
+    }
+
+    fun removeItem(position: Int) {
+        removedItem = items[position]
+        removedPosition = position
+
+        items.removeAt(position)
+        notifyItemRemoved(position)
+
     }
 
 

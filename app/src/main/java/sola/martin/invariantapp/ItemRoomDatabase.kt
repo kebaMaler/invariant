@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-@Database(entities = [Item::class], version = 2)
+@Database(entities = [Item::class], version = 3, exportSchema = false)
 abstract  class ItemRoomDatabase: RoomDatabase() {
 
     abstract fun itemDao(): ItemDao

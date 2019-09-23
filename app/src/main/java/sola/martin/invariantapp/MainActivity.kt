@@ -23,9 +23,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var itemViewModel: ItemViewModel
     private val newItemActivityRequestCode = 1
+    private val editItemActivityRequestCode = 2
+
     private lateinit var colorDrawableBackground: ColorDrawable
     private lateinit var deleteIcon: Drawable
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDirection: Int) {
-                adapter.removeItem(viewHolder.adapterPosition, viewHolder)
+                adapter.removeItemSwipe(viewHolder.adapterPosition, viewHolder)
             }
 
             override fun onChildDraw(
@@ -117,16 +118,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == newItemActivityRequestCode && resultCode == Activity.RESULT_OK && data != null) {
-            data.let {
-                val item = Item(
 
-                    it.getStringExtra(NewItemActivity.EXTRA_TITLE),
-                    it.getStringExtra(NewItemActivity.EXTRA_START).toLong(),
-                    it.getStringExtra(NewItemActivity.EXTRA_END).toLong()
-                )
 
-                itemViewModel.insert(item)
+        if ( resultCode == Activity.RESULT_OK && data != null) {
+
+            val item = data.getParcelableExtra<Item>(NewItemActivity.EXTRA_ITEM)
+
+            when(requestCode){
+
+                newItemActivityRequestCode -> itemViewModel.insert(item)
+                editItemActivityRequestCode -> {
+                    itemViewModel.insert(item)
+                }
             }
 
         } else {
@@ -136,8 +139,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.LENGTH_LONG
             ).show()
         }
-
-
     }
 
 }
